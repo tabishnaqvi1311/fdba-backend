@@ -23,19 +23,19 @@ export const registerPlayerSchema = z.object({
         .string()
         .length(10, { message: "Valid contact number is required" }),
 
-    organizationType: z.enum(["SCHOOL", "COLLEGE", "ORGANIZATION"], {
+    organisationType: z.enum(["SCHOOL", "COLLEGE", "ORGANISATION"], {
         required_error: "Please select an organization type",
     }),
-    organizationName: z
+    organisationName: z
         .string()
         .min(1, { message: "Organization name is required" }),
-    organizationEmail: z
+    organisationEmail: z
         .string()
         .email({ message: "Invalid organization email" }),
-    organizationContactNumber: z.string().length(10, {
+    organisationContactNumber: z.string().length(10, {
         message: "Valid organization contact number is required",
     }),
-    organizationAddress: z
+    organisationAddress: z
         .string()
         .min(1, { message: "Organization address is required" }),
     nameOfContactPerson: z

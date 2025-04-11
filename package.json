@@ -13,17 +13,20 @@
     "description": "",
     "dependencies": {
         "@aws-sdk/client-s3": "^3.787.0",
+        "@paralleldrive/cuid2": "^2.2.2",
         "@prisma/client": "^6.6.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
         "cors": "^2.8.5",
         "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
         "razorpay": "^2.9.6",
         "ts-node": "^10.9.2",
         "typescript": "^5.8.3",
         "zod": "^3.24.2"
     },
     "devDependencies": {
+        "@types/jsonwebtoken": "^9.0.9",
         "prisma": "^6.6.0"
     }
 }

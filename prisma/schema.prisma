@@ -1,114 +1,111 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Payment {
-  id                 String            @id
-  razorpayPaymentId  String?           @unique
-  razorpayOrderId    String?           @unique
-  razorpaySignature  String?
-  amount             Int
-  currency           String            @default("INR")
-  status             PaymentStatus     @default(PENDING)
-  paymentMethod      String?
-  description        String?
-  playerId           String?           @unique
-  tournamentPlayerId String?           @unique
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime
-  RegisteredPlayer   RegisteredPlayer? @relation(fields: [playerId], references: [id])
-  TournamentPlayer   TournamentPlayer? @relation(fields: [tournamentPlayerId], references: [id])
+    id                 String            @id @default(cuid())
+    razorpayPaymentId  String?           @unique
+    razorpayOrderId    String?           @unique
+    razorpaySignature  String?
+    amount             Int
+    currency           String            @default("INR")
+    status             PaymentStatus     @default(PENDING)
+    paymentMethod      String?
+    description        String?
+    playerId           String?           @unique
+    tournamentPlayerId String?           @unique
+    createdAt          DateTime          @default(now())
+    updatedAt          DateTime          @updatedAt
+    RegisteredPlayer   RegisteredPlayer? @relation(fields: [playerId], references: [id])
+    TournamentPlayer   TournamentPlayer? @relation(fields: [tournamentPlayerId], references: [id])
 
-  @@index([status, createdAt])
+    @@index([status, createdAt])
 }
 
 model RegisteredPlayer {
-  id                   String           @id
-  playerId             String           @unique
-  name                 String
-  gender               Gender
-  dateOfBirth          String
-  placeOfBirth         String
-  identificationMarks  String
-  imageLink            String
-  dobProofLink         String
-  communicationAddress String
-  pinCode              String
-  email                String           @unique
-  contactNumber        String
-  organisationType     OrganisationType
-  organisationName     String
-  organisationEmail    String
-  organisationContact  String
-  organisationAddress  String
-  nameOfContact        String
-  fatherName           String
-  fatherContact        String
-  motherName           String
-  motherContact        String
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime
-  Payment              Payment?
+    id                   String           @id @default(cuid())
+    playerId             String           @unique
+    name                 String
+    gender               Gender
+    dateOfBirth          String
+    placeOfBirth         String
+    identificationMarks  String
+    imageLink            String
+    dobProofLink         String
+    communicationAddress String
+    pinCode              String
+    email                String           @unique
+    contactNumber        String
+    organisationType     OrganisationType
+    organisationName     String
+    organisationEmail    String
+    organisationContact  String
+    organisationAddress  String
+    nameOfContact        String
+    fatherName           String
+    fatherContact        String
+    motherName           String
+    motherContact        String
+    createdAt            DateTime         @default(now())
+    updatedAt            DateTime         @updatedAt
+    Payment              Payment?
 }
 
 model TournamentPlayer {
-  id                  String      @id
-  player1Name         String
-  player1Gender       Gender
-  player1Email        String
-  player1Phone        String
-  player1DateOfBirth  String
-  player1DobProofLink String
-  player2Name         String?
-  player2Gender       Gender?
-  player2Email        String?
-  player2Phone        String?
-  player2DateOfBirth  String?
-  player2DobProofLink String?
-  category            Category
-  ageCategory         AgeCategory
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime
-  Payment             Payment?
+    id                  String      @id @default(cuid())
+    player1Name         String
+    player1Gender       Gender
+    player1Email        String
+    player1Phone        String
+    player1DateOfBirth  String
+    player1DobProofLink String
+    player2Name         String?
+    player2Gender       Gender?
+    player2Email        String?
+    player2Phone        String?
+    player2DateOfBirth  String?
+    player2DobProofLink String?
+    category            Category
+    ageCategory         AgeCategory
+    createdAt           DateTime    @default(now())
+    updatedAt           DateTime    @updatedAt
+    Payment             Payment?
 }
 
 enum AgeCategory {
-  U11
-  U13
-  U15
-  U17
-  U19
-  SENIOR
+    U11
+    U13
+    U15
+    U17
+    U19
+    SENIOR
 }
 
 enum Category {
-  SINGLES
-  DOUBLES
-  MIXED_DOUBLES
+    SINGLES
+    DOUBLES
+    MIXED_DOUBLES
 }
 
 enum Gender {
-  MALE
-  FEMALE
+    MALE
+    FEMALE
 }
 
 enum OrganisationType {
-  SCHOOL
-  COLLEGE
-  ORGANISATION
+    SCHOOL
+    COLLEGE
+    ORGANISATION
 }
 
 enum PaymentStatus {
-  PENDING
-  CREATED
-  AUTHORIZED
-  CAPTURED
-  FAILED
-  REFUNDED
+    PENDING
+    CREATED
+    SUCCESS
+    FAILED
 }
