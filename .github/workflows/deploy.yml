@@ -2,7 +2,7 @@ name: deploy
 
 on:
     push:
-        branches: [main, dev]
+        branches: [main]
 
 jobs:
     deploy:
@@ -30,11 +30,8 @@ jobs:
                   username: ${{ secrets.DO_USERNAME }}
                   key: ${{ secrets.DO_SSH_KEY }}
                   script: |
-                      BRANCH="${GITHUB_REF#refs/heads/}"
-                      echo "Deploying branch: $BRANCH"
-
                       cd /home/tabish/fdba-backend
-                      git pull origin $BRANCH
+                      git pull origin main
                       npm install
                       pm2 restart --update-env 0
                       echo "deployment success!"
