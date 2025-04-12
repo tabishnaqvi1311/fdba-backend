@@ -18,7 +18,7 @@ export const tournamentRegisterSchema = z
     .object({
         player1: playerSchema,
         dobProof: z.string(),
-        ageCategory: z.enum(["U11", "U13", "U15", "U17", "U19", "SEN"]),
+        ageCategory: z.enum(["U11", "U13", "U15", "U17", "U19", "SENIOR"]),
         category: z.enum(["singles", "doubles", "mixed-doubles"], {
             required_error: "Please select a category",
         }),
