@@ -30,8 +30,9 @@ jobs:
                   username: ${{ secrets.DO_USERNAME }}
                   key: ${{ secrets.DO_SSH_KEY }}
                   script: |
+                      set -e
                       cd /home/tabish/fdba-backend
                       git pull origin main
-                      npm install
-                      pm2 restart --update-env 0
+                      /home/tabish/.nvm/versions/node/v22.14.0/bin/npm install
+                      /home/tabish/.nvm/versions/node/v22.14.0/bin/pm2 restart --update-env 0
                       echo "deployment success!"
