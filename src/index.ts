@@ -20,7 +20,7 @@ app.use("/payment", paymentRouter);
 app.use("/register", registerRouter);
 
 app.get("/health", (req: Request, res: Response) => {
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({ status: "working!" });
 });
 
 app.listen(port, () => {
