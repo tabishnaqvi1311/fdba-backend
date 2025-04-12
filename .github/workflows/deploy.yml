@@ -36,5 +36,6 @@ jobs:
                       cd /home/tabish/fdba-backend
                       git pull origin main
                       /home/tabish/.nvm/versions/node/v22.14.0/bin/npm install
+                      /home/tabish/.nvm/versions/node/v22.14.0/bin/npm run build
                       /home/tabish/.nvm/versions/node/v22.14.0/bin/pm2 restart --update-env 0
                       echo "deployment success!"
