@@ -31,6 +31,8 @@ jobs:
                   key: ${{ secrets.DO_SSH_KEY }}
                   script: |
                       set -e
+                      export NVM_DIR=~/.nvm
+                      source ~/.nvm/nvm.sh
                       cd /home/tabish/fdba-backend
                       git pull origin main
                       /home/tabish/.nvm/versions/node/v22.14.0/bin/npm install
