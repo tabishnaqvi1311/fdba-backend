@@ -168,7 +168,7 @@ export const RegisterController: RegisterControllerType = {
             const token = jwt.sign(
                 { id: result.player.id },
                 process.env.JWT_SECRET as string,
-                { expiresIn: "10m" },
+                { expiresIn: "30d" },
             );
 
             return res.status(200).json({
