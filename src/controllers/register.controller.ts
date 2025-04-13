@@ -28,6 +28,7 @@ async function generatePdf(
 ): Promise<Uint8Array<ArrayBufferLike>> {
     const browser = await puppeteer.launch({
         headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     const page = await browser.newPage();
