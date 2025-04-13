@@ -85,3 +85,19 @@ export async function uploadPdfsToS3(
             : null,
     };
 }
+
+export async function uploadCard(
+    pdfBuffer: Uint8Array<ArrayBufferLike>,
+    fileName: string,
+): Promise<string> {
+    const command = new PutObjectCommand({
+        Bucket: "manim-bot",
+        Key: fileName,
+        Body: pdfBuffer,
+        ContentType: "application/pdf",
+    });
+
+    await s3.send(command);
+
+    return `https://manim-bot.s3.amazonaws.com/${fileName}`;
+}

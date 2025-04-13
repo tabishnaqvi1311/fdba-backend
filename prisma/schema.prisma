@@ -30,6 +30,7 @@ model Payment {
 model RegisteredPlayer {
     id                   String           @id @default(cuid())
     playerId             String           @unique
+    cardUrl              String?
     name                 String
     gender               Gender
     dateOfBirth          String

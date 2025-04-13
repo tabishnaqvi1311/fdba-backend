@@ -12,12 +12,37 @@ import {
     RegisterTournament,
     tournamentRegisterSchema,
 } from "../../schemas/tournament-player-schema";
-import { uploadImageAndPdfToS3, uploadPdfsToS3 } from "../utils/s3";
+import { uploadCard, uploadImageAndPdfToS3, uploadPdfsToS3 } from "../utils/s3";
+import { RequestWithUser } from "../../types/RequestWithUser";
+import formatDateOnly from "../utils/format-date-only";
+import generateIdCardHtml from "../utils/generate-id-card-html";
+import puppeteer from "puppeteer";
 
 const razorpay = new Razorpay({
     key_id: process.env.TEST_KEY_ID!,
     key_secret: process.env.TEST_KEY_SECRET!,
 });
+
+async function generatePdf(
+    template: string,
+): Promise<Uint8Array<ArrayBufferLike>> {
+    const browser = await puppeteer.launch({
+        headless: true,
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(template, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({
+        format: "A4",
+        landscape: true,
+        printBackground: true,
+        margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" },
+    });
+
+    await browser.close();
+    return pdfBuffer;
+}
 
 export const RegisterController: RegisterControllerType = {
     playerRegister: async (req: Request, res: Response) => {
@@ -140,16 +165,9 @@ export const RegisterController: RegisterControllerType = {
             });
 
             const token = jwt.sign(
-                {
-                    image: result.player.imageLink,
-                    name: result.player.name,
-                    fatherName: result.player.fatherName,
-                    dob: result.player.dateOfBirth,
-                    playerId,
-                    createdAt: result.player.createdAt,
-                },
+                { id: result.player.id },
                 process.env.JWT_SECRET as string,
-                { expiresIn: "7d" },
+                { expiresIn: "10m" },
             );
 
             return res.status(200).json({
@@ -292,6 +310,80 @@ export const RegisterController: RegisterControllerType = {
             }
 
             return res.status(500).json({ message: "Registration failed" });
+        }
+    },
+    generateCard: async (req: RequestWithUser, res: Response) => {
+        const id = req.userId;
+
+        try {
+            const player = await prisma.registeredPlayer.findUnique({
+                where: { id },
+                select: {
+                    playerId: true,
+                    name: true,
+                    fatherName: true,
+                    dateOfBirth: true,
+                    imageLink: true,
+                    cardUrl: true,
+                },
+            });
+
+            const {
+                playerId,
+                name,
+                fatherName,
+                dateOfBirth,
+                imageLink,
+                cardUrl,
+            } = player!;
+
+            if (cardUrl) return res.status(200).json({ cardUrl });
+
+            if (
+                !playerId ||
+                !name ||
+                !fatherName ||
+                !dateOfBirth ||
+                !imageLink
+            ) {
+                return res
+                    .status(400)
+                    .json({ message: "Player data is incomplete" });
+            }
+
+            const template = generateIdCardHtml(
+                playerId,
+                imageLink,
+                name,
+                fatherName,
+                dateOfBirth,
+                formatDateOnly(new Date()),
+                formatDateOnly(
+                    new Date(
+                        new Date().setFullYear(new Date().getFullYear() + 1),
+                    ),
+                ),
+            );
+
+            const pdfBuffer = await generatePdf(template);
+
+            const uploadedPdf = await uploadCard(
+                pdfBuffer,
+                `id-cards/${playerId}.pdf`,
+            );
+
+            if (!uploadedPdf)
+                throw new Error("an error occured while uploading to s3");
+
+            await prisma.registeredPlayer.update({
+                where: { id: id },
+                data: { cardUrl: uploadedPdf },
+            });
+
+            return res.status(201).json({ uploadedPdf });
+        } catch (error) {
+            console.error("Card generation error:", error);
+            return res.status(500).json({ message: "Card generation failed" });
         }
     },
 };

@@ -5,8 +5,9 @@ import { SlowDownRequestHandler } from "express-slow-down";
 import { RateLimitRequestHandler } from "express-rate-limit";
 import createRateLimiter from "../middleware/rate-limiter";
 import createThrottler from "../middleware/throttler";
+import checkUserExist from "../middleware/check-user-exist";
 
-const { playerRegister, tournamentRegister } = RegisterController;
+const { playerRegister, tournamentRegister, generateCard } = RegisterController;
 
 const throttler: SlowDownRequestHandler = createThrottler({
     windowMs: 15 * 60 * 1000,
@@ -23,6 +24,13 @@ const limiter: RateLimitRequestHandler = createRateLimiter({
 });
 
 registerRouter.post("/player", throttler, limiter, playerRegister);
+registerRouter.get(
+    "/player/generate-card",
+    throttler,
+    limiter,
+    checkUserExist,
+    generateCard,
+);
 registerRouter.post("/tournament", throttler, limiter, tournamentRegister);
 
 export default registerRouter;
