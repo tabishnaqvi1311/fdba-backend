@@ -381,7 +381,7 @@ export const RegisterController: RegisterControllerType = {
                 data: { cardUrl: uploadedPdf },
             });
 
-            return res.status(201).json({ uploadedPdf });
+            return res.status(200).json({ uploadedPdf });
         } catch (error) {
             console.error("Card generation error:", error);
             return res.status(500).json({ message: "Card generation failed" });
