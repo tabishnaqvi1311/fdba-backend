@@ -77,9 +77,10 @@ export const RegisterController: RegisterControllerType = {
                 where: { email: parsedData.email },
             });
             if (doesEmailExist)
-                return res
-                    .status(400)
-                    .json({ message: "Email already exists" });
+                return res.status(400).json({
+                    message:
+                        "Player with that email already exists, please choose another one",
+                });
 
             const playerId = generatePlayerId();
 
@@ -381,7 +382,7 @@ export const RegisterController: RegisterControllerType = {
                 data: { cardUrl: uploadedPdf },
             });
 
-            return res.status(200).json({ uploadedPdf });
+            return res.status(200).json({ cardUrl: uploadedPdf });
         } catch (error) {
             console.error("Card generation error:", error);
             return res.status(500).json({ message: "Card generation failed" });
