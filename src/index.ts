@@ -5,6 +5,8 @@ import registerRouter from "./routes/register.route";
 import paymentRouter from "./routes/payment.route";
 import logRequest from "./middleware/request-logger";
 
+import { throttler, limiter } from "./middleware/global-limiter";
+
 const port = process.env.PORT || 8000;
 const SERVER_ORIGIN = process.env.SERVER_ORIGIN;
 
@@ -15,6 +17,9 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cors());
 
 app.use(logRequest);
+
+app.use(throttler);
+app.use(limiter);
 
 app.use("/payment", paymentRouter);
 app.use("/register", registerRouter);
