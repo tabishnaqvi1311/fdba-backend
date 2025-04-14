@@ -40,7 +40,7 @@ model RegisteredPlayer {
     dobProofLink         String
     communicationAddress String
     pinCode              String
-    email                String           @unique
+    email                String
     contactNumber        String
     organisationType     OrganisationType
     organisationName     String

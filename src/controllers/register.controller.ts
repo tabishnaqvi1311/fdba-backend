@@ -73,15 +73,6 @@ export const RegisterController: RegisterControllerType = {
 
             const parsedData: RegisterPlayer = validated.data;
 
-            const doesEmailExist = await prisma.registeredPlayer.findUnique({
-                where: { email: parsedData.email },
-            });
-            if (doesEmailExist)
-                return res.status(400).json({
-                    message:
-                        "Player with that email already exists, please choose another one",
-                });
-
             const playerId = generatePlayerId();
 
             const { imageUrl, pdfUrl } = await uploadImageAndPdfToS3(
