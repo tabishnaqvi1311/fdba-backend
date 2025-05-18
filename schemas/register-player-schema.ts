@@ -29,19 +29,9 @@ export const registerPlayerSchema = z.object({
     organisationName: z
         .string()
         .min(1, { message: "Organization name is required" }),
-    organisationEmail: z
-        .string()
-        .email({ message: "Invalid organization email" }),
-    organisationContactNumber: z.string().length(10, {
-        message: "Valid organization contact number is required",
-    }),
     organisationAddress: z
         .string()
         .min(1, { message: "Organization address is required" }),
-    nameOfContactPerson: z
-        .string()
-        .min(1, { message: "Contact person name is required" }),
-
     fatherName: z.string().min(1, { message: "Father's name is required" }),
     fatherNumber: z
         .string()
