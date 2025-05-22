@@ -16,7 +16,7 @@ app.use(express.json({ limit: "10mb" })); // or even '50mb' if needed
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(
     cors({
-        origin: ["https://fdba.vercel.app", "http://localhost:3000"],
+        origin: process.env.FRONTEND_ORIGIN,
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     }),
