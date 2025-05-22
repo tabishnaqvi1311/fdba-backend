@@ -14,8 +14,13 @@ const app = express();
 
 app.use(express.json({ limit: "10mb" })); // or even '50mb' if needed
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(cors());
-
+app.use(
+    cors({
+        origin: ["https://fdba.vercel.app", "http://localhost:3000"],
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    }),
+);
 app.use(logRequest);
 
 app.use(throttler);
