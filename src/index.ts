@@ -21,6 +21,13 @@ app.use(
         credentials: true,
     }),
 );
+app.options(
+    "*",
+    cors({
+        origin: "https://fdba.vercel.app",
+        credentials: true,
+    }),
+);
 app.use(logRequest);
 
 app.use(throttler);
