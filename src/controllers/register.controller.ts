@@ -210,7 +210,7 @@ export const RegisterController: RegisterControllerType = {
                 parsedData.dobProof,
                 parsedData.player2DobProof as string | null,
                 generatePlayerId(),
-                generatePlayerId(),
+                parsedData.player2 ? generatePlayerId() : null,
             );
 
             if (!docUrl1) {
