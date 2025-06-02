@@ -6,6 +6,9 @@ import paymentRouter from "./routes/payment.route";
 import logRequest from "./middleware/request-logger";
 
 import { throttler, limiter } from "./middleware/global-limiter";
+import adminRouter from "./routes/admin.route";
+
+import cookieParser from "cookie-parser";
 
 const port = process.env.PORT || 8000;
 const SERVER_ORIGIN = process.env.SERVER_ORIGIN;
@@ -14,6 +17,7 @@ const app = express();
 
 app.use(express.json({ limit: "10mb" })); // or even '50mb' if needed
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(cookieParser());
 app.use(
     cors({
         origin: process.env.FRONTEND_ORIGIN,
@@ -29,6 +33,7 @@ app.use(limiter);
 
 app.use("/payment", paymentRouter);
 app.use("/register", registerRouter);
+app.use("/admin", adminRouter);
 
 app.get("/health", (req: Request, res: Response) => {
     res.status(200).json({ status: "working!" });

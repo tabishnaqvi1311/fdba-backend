@@ -23,7 +23,7 @@ const razorpay = new Razorpay({
     key_secret: process.env.TEST_KEY_SECRET!,
 });
 
-async function generatePdf(
+export async function generatePdf(
     template: string,
 ): Promise<Uint8Array<ArrayBufferLike>> {
     const browser = await puppeteer.launch({
