@@ -3,10 +3,14 @@ const adminRouter = express.Router();
 
 import { adminController } from "../controllers/admin.controller";
 
-const { login, me, generateId } = adminController;
+const { login, me, generateId, uploadMinutes, getMeetings, logout } =
+    adminController;
 
 adminRouter.post("/login", login);
 adminRouter.get("/me", me);
 adminRouter.post("/generate-id", generateId);
+adminRouter.post("/upload-minutes", uploadMinutes);
+adminRouter.get("/meetings", getMeetings);
+adminRouter.get("/logout", logout);
 
 export default adminRouter;

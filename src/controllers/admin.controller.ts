@@ -8,6 +8,7 @@ import generateIdCardHtml from "../utils/generate-id-card-html";
 import formatDateOnly from "../utils/format-date-only";
 import { uploadCard } from "../utils/s3";
 import { generatePdf } from "./register.controller";
+import { parseBase64 } from "../utils/parse-base64";
 
 export const adminController: AdminControllerType = {
     login: async (req: Request, res: Response) => {
@@ -59,10 +60,16 @@ export const adminController: AdminControllerType = {
         }
     },
     me: async (req: RequestWithAdmin, res: Response) => {
-        if (!req.cookies.adminToken) {
+        const token = req.cookies.adminToken;
+        if (!token) {
             return res.status(401).json({ error: "Unauthorized" });
         }
-        return res.status(200).json({ sucess: true });
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+            return res.status(200).json({ success: true });
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or Expired Token" });
+        }
     },
     generateId: async (req: RequestWithAdmin, res: Response) => {
         if (!req.cookies.adminToken) {
@@ -86,6 +93,11 @@ export const adminController: AdminControllerType = {
                 },
             });
 
+            if (!player)
+                return res
+                    .status(404)
+                    .json({ error: "Player with that ID not found" });
+
             const {
                 playerId,
                 name,
@@ -106,7 +118,7 @@ export const adminController: AdminControllerType = {
             ) {
                 return res
                     .status(400)
-                    .json({ message: "Player data is incomplete" });
+                    .json({ message: "Player data is incomplete!" });
             }
 
             const template = generateIdCardHtml(
@@ -143,5 +155,110 @@ export const adminController: AdminControllerType = {
             console.error("Card generation error:", error);
             return res.status(500).json({ message: "Card generation failed" });
         }
+    },
+
+    uploadMinutes: async (req: RequestWithAdmin, res: Response) => {
+        if (!req.cookies.adminToken) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const { meetingTitle, meetingDate, meetingType, doc } = req.body;
+
+        // TODO: to validate the schema with zod
+
+        if (!meetingTitle || !meetingDate || !doc) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        const { contentType: pdfType, buffer: pdfBuffer } = parseBase64(doc);
+        const timestamp = Date.now();
+
+        const pdfName = `meetings/${meetingType}-${timestamp}.pdf`;
+        let meetingMinutes: string;
+
+        try {
+            meetingMinutes = await uploadCard(pdfBuffer, pdfName);
+        } catch (error) {
+            console.error("Minutes upload error:", error);
+            return res.status(500).json({ message: "Minutes upload failed" });
+        }
+
+        try {
+            await prisma.meetingMinutes.create({
+                data: {
+                    meetingTitle,
+                    meetingDate,
+                    meetingType,
+                    meetingMinutes,
+                },
+            });
+        } catch (error) {
+            console.error("Minutes creation error:", error);
+            return res.status(500).json({ message: "Minutes creation failed" });
+        }
+
+        return res
+            .status(200)
+            .json({ message: "Minutes uploaded successfully" });
+    },
+
+    getMeetings: async (req: Request, res: Response) => {
+        const { type, cursor, limit = 10, sort } = req.query;
+
+        const whereClause: any = {};
+
+        const orderBy: any = { createdAt: "desc" };
+        if (sort === "asc") orderBy.createdAt = "asc";
+
+        if (type) whereClause.meetingType = type;
+        if (cursor) {
+            if (sort === "asc") {
+                // For ascending, get records newer than cursor
+                whereClause.createdAt = {
+                    gt: new Date(cursor as string),
+                };
+            } else {
+                // For descending, get records older than cursor
+                whereClause.createdAt = {
+                    lt: new Date(cursor as string),
+                };
+            }
+        }
+        try {
+            const meetings = await prisma.meetingMinutes.findMany({
+                where: whereClause,
+                orderBy,
+                take: Number(limit),
+                select: {
+                    id: true,
+                    meetingTitle: true,
+                    meetingDate: true,
+                    meetingType: true,
+                    meetingMinutes: true,
+                    createdAt: true,
+                },
+            });
+            const nextCursor =
+                meetings.length > 0
+                    ? meetings[meetings.length - 1].createdAt.toISOString()
+                    : null;
+            return res.status(200).json({ meetings, nextCursor });
+        } catch (e) {
+            console.log(e);
+            res.status(500).send({ message: "internal server error" });
+        }
+    },
+    logout: async (req: Request, res: Response) => {
+        const token = req.cookies.adminToken;
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+        res.clearCookie("jwt", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            path: "/",
+        });
+        return res.status(200).json({ message: "Logged out" });
     },
 };
