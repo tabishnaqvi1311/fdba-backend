@@ -78,6 +78,22 @@ model TournamentPlayer {
     Payment             Payment?
 }
 
+model MeetingMinutes {
+    id             String      @id @default(cuid())
+    meetingTitle   String
+    meetingDate    String
+    meetingType    MeetingType
+    meetingMinutes String
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @updatedAt
+}
+
+enum MeetingType {
+    AGM
+    CON
+    FIX
+}
+
 enum AgeCategory {
     U11
     U13
