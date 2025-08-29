@@ -11,6 +11,6 @@ adminRouter.get("/me", me);
 adminRouter.post("/generate-id", generateId);
 adminRouter.post("/upload-minutes", uploadMinutes);
 adminRouter.get("/meetings", getMeetings);
-adminRouter.get("/logout", logout);
+adminRouter.post("/logout", logout);
 
 export default adminRouter;

@@ -253,7 +253,7 @@ export const adminController: AdminControllerType = {
         if (!token) {
             return res.status(401).json({ error: "Unauthorized" });
         }
-        res.clearCookie("jwt", {
+        res.clearCookie("adminToken", {
             httpOnly: true,
             secure: true,
             sameSite: "strict",
