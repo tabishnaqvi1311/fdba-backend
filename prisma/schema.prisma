@@ -101,6 +101,7 @@ enum AgeCategory {
     U17
     U19
     SENIOR
+    MASTERS
 }
 
 enum Category {
