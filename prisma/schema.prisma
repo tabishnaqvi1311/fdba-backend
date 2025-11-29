@@ -101,7 +101,14 @@ enum AgeCategory {
     U17
     U19
     SENIOR
-    MASTERS
+    AGE35
+    AGE40
+    AGE45
+    AGE50
+    AGE55
+    AGE60
+    AGE65
+    AGE70
 }
 
 enum Category {
