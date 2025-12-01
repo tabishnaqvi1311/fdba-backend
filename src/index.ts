@@ -12,6 +12,8 @@ import cookieParser from "cookie-parser";
 
 const port = process.env.PORT || 8000;
 const SERVER_ORIGIN = process.env.SERVER_ORIGIN;
+const vercelOrigin = process.env.FRONTEND_ORIGIN!;
+const mainOrigin = process.env.FRONTEND_ORIGIN_MAIN!;
 
 const app = express();
 
@@ -20,7 +22,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 app.use(
     cors({
-        origin: process.env.FRONTEND_ORIGIN,
+        origin: [vercelOrigin, mainOrigin],
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     }),
